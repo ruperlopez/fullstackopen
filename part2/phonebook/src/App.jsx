@@ -40,7 +40,10 @@ const App = () => {
         setPersons(
           persons.map((person) => (person.id === newPerson.id ? res : person)),
         );
-        setMessage(`Updated number for ${person.name}`);
+        setMessage({
+          message: `Updated number for ${person.name}`,
+          type: "SUCCESS",
+        });
         setTimeout(() => {
           setMessage(null);
         }, 2000);
@@ -52,11 +55,12 @@ const App = () => {
     const newPerson = { name: newName, number: newNumber };
 
     personService.create(newPerson).then((person) => {
-      setPersons([...persons, person])
-      setMessage(`Added ${person.name}`);
-      setTimeout(()=>{setMessage(null)}, 2000)
+      setPersons([...persons, person]);
+      setMessage({ message: `Added ${person.name}`, type: "SUCCESS" });
+      setTimeout(() => {
+        setMessage(null);
+      }, 2000);
     });
-
 
     setNewName("");
     setNewNumber("");
@@ -66,41 +70,62 @@ const App = () => {
     if (!window.confirm(`Delete ${person.name}?`)) return;
     personService
       .remove(person.id)
-      .then((_) => setPersons(persons.filter((p) => p.id !== person.id)))
-      .catch((_) => alert(`Error deleting ${person.name}`));
-      setMessage(`deleted ${person.name}`);
-      setTimeout(()=>{setMessage(null)}, 2000)
-  };
-  const handleNameChange = (event) => {
-    setNewName(event.target.value);
-  };
-  const handleNumberChange = (event) => {
-    setNewNumber(event.target.value);
-  };
-  const handleFilterChange = (event) => {
-    setFilter(event.target.value);
-  };
-  const filteredPersons = persons.filter((person) =>
-    person.name.toLowerCase().includes(filter.toLowerCase()),
-  );
+      .then((_) => {
+        setPersons(persons.filter((p) => p.id !== person.id));
+        setMessage({
+          message: `Deleted ${person.name}`,
+          type: "SUCCESS",
+        });
+        setTimeout(() => {
+          setMessage(null);
+        }, 2000);
+      })
+      .catch((err) => {
+        if (err.response.status === 404) {
+          setMessage({
+            message: `Information of ${person.name} has already been removed from server.`,
+            type: "ERROR",
+          });
+        } else {
+          setMessage({
+            message: `Error deleting ${person.name}`,
+            type: "ERROR",
+          });
+        }
+        setTimeout(() => {
+          setMessage(null);
+        }, 2000);
+      });
+}
+    const handleNameChange = (event) => {
+      setNewName(event.target.value);
+    };
+    const handleNumberChange = (event) => {
+      setNewNumber(event.target.value);
+    };
+    const handleFilterChange = (event) => {
+      setFilter(event.target.value);
+    };
+    const filteredPersons = persons.filter((person) =>
+      person.name.toLowerCase().includes(filter.toLowerCase()),
+    );
 
-  return (
-    <>
-      <h2>Phonebook</h2>
-      <Notification message={message} />
-      <Filter filter={filter} handleFilterChange={handleFilterChange} />
-      <h2> add a new </h2>
-      <PersonForm
-        addPerson={addPerson}
-        newName={newName}
-        handleNameChange={handleNameChange}
-        newNumber={newNumber}
-        handleNumberChange={handleNumberChange}
-      />
-      <h2>Numbers</h2>
-      <Persons persons={filteredPersons} handleDelete={handleDelete} />
-    </>
-  );
-};
-
+    return (
+      <>
+        <h2>Phonebook</h2>
+        <Notification message={message} />
+        <Filter filter={filter} handleFilterChange={handleFilterChange} />
+        <h2> add a new </h2>
+        <PersonForm
+          addPerson={addPerson}
+          newName={newName}
+          handleNameChange={handleNameChange}
+          newNumber={newNumber}
+          handleNumberChange={handleNumberChange}
+        />
+        <h2>Numbers</h2>
+        <Persons persons={filteredPersons} handleDelete={handleDelete} />
+      </>
+    );
+}
 export default App;
