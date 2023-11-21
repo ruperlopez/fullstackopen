@@ -28,10 +28,16 @@ const App = () => {
     ) {
       return alert(`${newName} is already added to phonebook`);
     }
-    setPersons([...persons, { name: newName, number: newNumber }]);
+    const newPerson = {name: newName, number: newNumber};
+
+    axios
+      .post("http://localhost:3001/persons", newPerson)
+      .then((response) => setPersons([...persons, response.data]));
+
     setNewName("");
     setNewNumber("");
   };
+
 
   const handleNameChange = (event) => {
     setNewName(event.target.value);
