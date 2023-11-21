@@ -8,9 +8,9 @@ const Course = ({ courses }) => {
     <>
       {courses.map((course) => (
         <div key={course.id}>
-          <Header course={course} />
+          <Header name={course.name} />
           <Content parts={course.parts} />
-          <Total course={course}/> 
+          <Total parts={course.parts}/> 
         </div>
       ))}
     </>
