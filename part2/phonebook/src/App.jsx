@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import Notification from "./components/Notification";
 import personService from "./services/persons.js";
 
 const App = () => {
@@ -9,6 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((persons) => {
@@ -34,24 +36,27 @@ const App = () => {
 
       const newPerson = { ...person, number: newNumber };
 
-      return personService
-        .update(person.id, newPerson)
-        .then((res) =>
-          setPersons(
-            persons.map((person) =>
-              person.id === newPerson.id ? res : person,
-            ),
-          ),
+      return personService.update(person.id, newPerson).then((res) => {
+        setPersons(
+          persons.map((person) => (person.id === newPerson.id ? res : person)),
         );
+        setMessage(`Updated number for ${person.name}`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 2000);
+      });
     } else if (person) {
       return alert(errorMessage);
     }
 
     const newPerson = { name: newName, number: newNumber };
 
-    personService
-      .create(newPerson)
-      .then((person) => setPersons([...persons, person]));
+    personService.create(newPerson).then((person) => {
+      setPersons([...persons, person])
+      setMessage(`Added ${person.name}`);
+      setTimeout(()=>{setMessage(null)}, 2000)
+    });
+
 
     setNewName("");
     setNewNumber("");
@@ -63,6 +68,8 @@ const App = () => {
       .remove(person.id)
       .then((_) => setPersons(persons.filter((p) => p.id !== person.id)))
       .catch((_) => alert(`Error deleting ${person.name}`));
+      setMessage(`deleted ${person.name}`);
+      setTimeout(()=>{setMessage(null)}, 2000)
   };
   const handleNameChange = (event) => {
     setNewName(event.target.value);
@@ -80,6 +87,7 @@ const App = () => {
   return (
     <>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <h2> add a new </h2>
       <PersonForm
