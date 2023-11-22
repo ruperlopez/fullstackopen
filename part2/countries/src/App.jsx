@@ -25,8 +25,7 @@ function App() {
 	return (
 		<div>
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
-      {filter && <Countries countries={filteredCountries} />}
-      {}
+      {filter && <Countries countries={filteredCountries} setFilter={setFilter}/>}
 		</div>
 	);
 }
