@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require('cors')
 
 // middleware para imprimir info acerca de los request que mandamos al servidor
 const requestLogger = (request, response, next) => {
@@ -15,6 +16,7 @@ const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
+app.use(cors())
 // el orden de estos middlewares tiene que ser asi
 app.use(express.json()) // json-parser: es un middleware que importamos
 app.use(requestLogger) // inicializamos middle ware creado por nosotros
