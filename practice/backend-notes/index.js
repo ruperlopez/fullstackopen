@@ -20,6 +20,7 @@ app.use(cors());
 // el orden de estos middlewares tiene que ser asi
 app.use(express.json()); // json-parser: es un middleware que importamos
 app.use(requestLogger); // inicializamos middle ware creado por nosotros
+app.use(express.static('dist')) // carga cosas estaticas
 
 let notes = [
   {
